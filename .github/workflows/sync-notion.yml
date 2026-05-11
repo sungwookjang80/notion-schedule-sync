@@ -23,16 +23,10 @@ jobs:
       - name: Run Notion scraping script
         run: node scripts/sync-notion.js
 
-      - name: Check for changes
-        id: changes
-        run: |
-          git diff --quiet lib/sample-programs.ts && echo "changed=false" >> $GITHUB_OUTPUT || echo "changed=true" >> $GITHUB_OUTPUT
-
       - name: Commit and push if changed
-        if: steps.changes.outputs.changed == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add lib/sample-programs.ts
-          git commit -m "sync: auto update Notion schedule $(date +'%Y-%m-%d')"
+          git add -A
+          git diff --staged --quiet || git commit -m "sync: auto update Notion schedule $(date +'%Y-%m-%d')"
           git push
